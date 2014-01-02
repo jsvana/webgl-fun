@@ -3,22 +3,28 @@
 		<title>WebGL</title>
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+
+			canvas {
+				/*
+				width: 100%;
+				height: 100%;
+				*/
+				width: 480px;
+				height: 360px;
+				border: none;
+			}
+		</style>
+
+		<script src="jquery.min.js"></script>
 		<script src="gl-matrix/dist/gl-matrix.js"></script>
 		<script src="webgl-utils.js"></script>
 
-		<script id="block.frag" type="x-shader/x-fragment">
-			precision mediump float;
-
-			varying vec2 vTextureCoord;
-
-			uniform sampler2D uSampler;
-
-			void main(void) {
-				gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-			}
-		</script>
-
-		<script id="block.vert" type="x-shader/x-vertex">
+		<script id="base.vert" type="x-shader/x-vertex">
 			attribute vec3 aVertexPosition;
 			attribute vec2 aTextureCoord;
 
@@ -32,7 +38,36 @@
 				vTextureCoord = aTextureCoord;
 			}
 		</script>
+
+		<script id="block.frag" type="x-shader/x-fragment">
+			precision mediump float;
+
+			varying vec2 vTextureCoord;
+
+			uniform sampler2D uSampler;
+
+			void main(void) {
+				gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+			}
+		</script>
+
+		<script id="entity.frag" type="x-shader/x-fragment">
+			precision mediump float;
+
+			varying vec2 vTextureCoord;
+
+			uniform sampler2D uSampler;
+
+			void main(void) {
+				gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+			}
+		</script>
+
 		<script src="js/asset.js"></script>
+		<script src="js/camera.js"></script>
+		<script src="js/entity.js"></script>
+		<script src="js/input.js"></script>
+		<script src="js/map.js"></script>
 		<script src="js/tile.js"></script>
 		<script src="js/shader.js"></script>
 		<script src="js/game.js"></script>
@@ -40,6 +75,6 @@
 	</head>
 
 	<body onload="init();">
-		<canvas id="c" style="border: none;" width="500" height="500"></canvas>
+		<canvas id="c"></canvas>
 	</body>
 </html>

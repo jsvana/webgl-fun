@@ -5,6 +5,7 @@ var ShaderManager = (function() {
 		this.vertShaders = {};
 		this.fragShaders = {};
 		this.programs = {};
+		this.currentProg = '';
 	};
 
 	ShaderManager.prototype.loadShader = function(gl, shader) {
@@ -23,10 +24,10 @@ var ShaderManager = (function() {
 		}
 
 		var s;
-		if (shaderScript.type == 'x-shader/x-fragment') {
+		if (shaderScript.type === 'x-shader/x-fragment') {
 			this.fragShaders[shader] = gl.createShader(gl.FRAGMENT_SHADER);
 			s = this.fragShaders[shader];
-		} else if (shaderScript.type == 'x-shader/x-vertex') {
+		} else if (shaderScript.type === 'x-shader/x-vertex') {
 			this.vertShaders[shader] = gl.createShader(gl.VERTEX_SHADER);
 			s = this.vertShaders[shader];
 		} else {
@@ -44,10 +45,30 @@ var ShaderManager = (function() {
 		return s;
 	};
 
+	ShaderManager.prototype.addUniform = function(gl, program, uniform) {
+		var p = this.programs[program];
+
+		p[uniform] = gl.getUniformLocation(p, uniform);
+
+		this.programs[program] = p;
+
+		return p;
+	};
+
 	ShaderManager.prototype.createProgram
 			= function(gl, vertex, fragment, program) {
-		var v = this.vertShaders[vertex];
-		var f = this.fragShaders[fragment];
+		if (!this.vertShaders[vertex]) {
+			console.log('Loading vertex shader ' + vertex);
+			var v = this.loadShader(gl, vertex);
+		} else {
+			var v = this.vertShaders[vertex];
+		}
+		if (!this.fragShaders[fragment]) {
+			console.log('Loading fragment shader ' + fragment);
+			var f = this.loadShader(gl, fragment);
+		} else {
+			var f = this.fragShaders[fragment];
+		}
 
 		this.programs[program] = gl.createProgram();
 		var p = this.programs[program];
@@ -65,9 +86,9 @@ var ShaderManager = (function() {
 		p.textureCoordAttribute = gl.getAttribLocation(p, 'aTextureCoord');
 		gl.enableVertexAttribArray(p.textureCoordAttribute);
 
-		p.pMatrixUniform = gl.getUniformLocation(p, 'uPMatrix');
-		p.mvMatrixUniform = gl.getUniformLocation(p, 'uMVMatrix');
-		p.samplerUniform = gl.getUniformLocation(p, 'uSampler');
+		this.addUniform(gl, program, 'uPMatrix');
+		this.addUniform(gl, program, 'uMVMatrix');
+		this.addUniform(gl, program, 'uSampler');
 
 		this.programs[program] = p;
 
@@ -75,9 +96,28 @@ var ShaderManager = (function() {
 	};
 
 	ShaderManager.prototype.useProgram = function(gl, program) {
-		var p = this.programs[program];
-		gl.useProgram(p);
-		return p;
+		if (!program) {
+			this.currentProg = '';
+		} else {
+			this.currentProg = program;
+			var p = this.programs[program];
+			gl.useProgram(p);
+			return p;
+		}
+	};
+
+	ShaderManager.prototype.getProgram = function(program) {
+		return this.programs[program];
+	};
+
+	ShaderManager.prototype.getCurrentProgram = function() {
+		return this.programs[this.currentProg];
+	};
+
+	ShaderManager.prototype.eachProgram = function(func) {
+		for (var p in this.programs) {
+			func(p, this.programs[p]);
+		}
 	};
 
 	return {

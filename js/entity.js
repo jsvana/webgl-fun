@@ -1,4 +1,4 @@
-var Tile = function(gl, pos, tile) {
+var Entity = function(gl, pos, ent) {
 	this.tileSize = 24;
 
 	this.assetman = AssetManager.getInstance();
@@ -15,18 +15,24 @@ var Tile = function(gl, pos, tile) {
 		};
 	}
 
-	var texDim = this.assetman.textureDimensions('assets/world.png');
+	if (ent) {
+		this.entity = ent;
+	} else {
+		this.entity = 0;
+	}
 
-	var tileX = (tile % Math.floor(texDim.w / this.tileSize)) * this.tileSize
+	var texDim = this.assetman.textureDimensions('assets/entities.png');
+
+	var tileX = (this.entity % Math.floor(texDim.w / this.tileSize)) * this.tileSize
 		/ texDim.w;
-	var tileY = Math.floor(tile / Math.floor(texDim.w / this.tileSize))
+	var tileY = Math.floor(this.entity / Math.floor(texDim.w / this.tileSize))
 		* this.tileSize / texDim.h;
 
 	var verts = [
-		0, 0, 0,
-		1, 0, 0,
-		1, 1, 0,
-		0, 1, 0,
+		0, 0, 0.1,
+		1, 0, 0.1,
+		1, 1, 0.1,
+		0, 1, 0.1,
 	];
 
 	this.buffer = gl.createBuffer();
@@ -59,10 +65,39 @@ var Tile = function(gl, pos, tile) {
 	this.indexBuf.numItems = 6;
 
 	this.mvMatrix = mat4.create();
+
+	this.frameCtr = 0;
+	this.frame = 0;
 };
 
-Tile.prototype.render = function(gl) {
-	this.prog = this.shaderman.useProgram(gl, 'block');
+Entity.prototype.update = function(gl, ticks) {
+	this.frameCtr += ticks;
+
+	if (this.frameCtr > 10000) {
+		this.frame = (this.frame + 1) % 2;
+
+		// Update shader
+		this.prog = this.shaderman.useProgram(gl, 'entity');
+		gl.uniform1i(this.prog.uFrame, this.frame);
+	}
+};
+
+Entity.prototype.setPosition = function(pos) {
+	this.position = pos;
+};
+
+Entity.prototype.move = function(pos) {
+	this.position.x += pos.x / this.tileSize;
+	this.position.y += pos.y / this.tileSize;
+};
+
+Entity.prototype.moveTile = function(pos) {
+	this.position.x += pos.x;
+	this.position.y += pos.y;
+};
+
+Entity.prototype.render = function(gl) {
+	this.prog = this.shaderman.useProgram(gl, 'entity');
 
 	mat4.identity(this.mvMatrix);
 
@@ -80,7 +115,7 @@ Tile.prototype.render = function(gl) {
 		this.texBuf.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.activeTexture(gl.TEXTURE0);
-	this.assetman.useTexture(gl, 'assets/world.png');
+	this.assetman.useTexture(gl, 'assets/entities.png');
 	gl.uniform1i(this.prog.uSampler, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);

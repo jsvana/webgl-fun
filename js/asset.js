@@ -3,6 +3,7 @@ var AssetManager = (function() {
 
 	var AssetManager = function() {
 		this.textures = {};
+		this.json = {};
 	};
 
 	var storeImage = function(gl, name, texture) {
@@ -22,7 +23,7 @@ var AssetManager = (function() {
 		gl.bindTexture(gl.TEXTURE_2D, this.textures[texture]);
 	};
 
-	AssetManager.prototype.textureDimentions = function(texture) {
+	AssetManager.prototype.textureDimensions = function(texture) {
 		if (!this.textures[texture]) {
 			return null;
 		}
@@ -33,33 +34,66 @@ var AssetManager = (function() {
 		};
 	};
 
+	AssetManager.prototype.getJSON = function(name) {
+		return this.json[name];
+	};
+
 	AssetManager.prototype.loadTexture = function(gl, name, load) {
 		var tex = gl.createTexture();
 		tex.image = new Image();
-		if (typeof load === "function") {
-			tex.image.onload = function() {
-				load(gl, tex);
-			};
-		} else {
-			tex.image.onload = function() {
+		tex.image.onload = function() {
+			if (load) {
+				load(gl, name, tex);
+			} else {
 				storeImage(gl, name, tex);
-			};
-		}
+			}
+		};
+		tex.image.onerror = function() {
+			console.log('Error loading ' + name);
+		};
 		tex.image.src = name;
 	};
 
-	AssetManager.prototype.loadList = function(gl, list, callback) {
-		var count = 0;
+	AssetManager.prototype.loadJSON = function(name, load) {
+		$.getJSON(name, load);
+	};
 
-		for (var tex in list) {
-			console.log('Loading ' + list[tex]);
-			this.loadTexture(gl, list[tex], function(gl, texture) {
-				storeImage(gl, list[tex], texture);
-				count++;
-				if (count === list.length) {
-					callback();
-				}
-			});
+	AssetManager.prototype.loadList = function(gl, assets, callback) {
+		var count = 0;
+		var total = 0;
+		var self = this;
+
+		if (assets.textures) {
+			total += assets.textures.length;
+		}
+		if (assets.json) {
+			total += assets.json.length;
+		}
+
+		if (assets.textures) {
+			for (var tex in assets.textures) {
+				console.log('Loading ' + assets.textures[tex]);
+				this.loadTexture(gl, assets.textures[tex], function(gl, name, texture) {
+					storeImage(gl, name, texture);
+					count++;
+					if (count === total) {
+						callback();
+					}
+				});
+			}
+		}
+
+		if (assets.json) {
+			for (var j in assets.json) {
+				console.log('Loading ' + assets.json[j]);
+				this.loadJSON(assets.json[j], function(data) {
+					self.json[assets.json[j]] = data;
+					count++;
+					if (count === total) {
+						callback();
+					}
+				});
+			}
 		}
 	};
 
