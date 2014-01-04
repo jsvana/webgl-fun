@@ -1,5 +1,5 @@
 var Map = function(gl) {
-	var data = AssetManager.getInstance().getJSON('assets/map.json');
+	var data = AssetManager.getInstance().getJSON('assets/json/map.json');
 	this.tiles = [];
 	for (var i = 0; i < 15; i++) {
 		var r = [];

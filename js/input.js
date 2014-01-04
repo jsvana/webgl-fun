@@ -27,3 +27,10 @@ var Key = {
 		delete this._pressed[event.keyCode];
 	}
 };
+
+var Direction = {
+	LEFT: 0,
+	RIGHT: 1,
+	UP: 2,
+	DOWN: 3
+};

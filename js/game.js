@@ -26,8 +26,13 @@ Game.prototype.run = function(gl) {
 	var self = this;
 
 	var assets = {
-		textures: ['assets/world.png', 'assets/entities.png'],
-		json: ['assets/map.json']
+		json: ['assets/json/map.json'],
+		textures: ['assets/images/world.png', 'assets/images/entities.png'],
+		shaders: [
+			'assets/shaders/base.vert.glsl',
+			'assets/shaders/block.frag.glsl',
+			'assets/shaders/entity.frag.glsl'
+		]
 	};
 
 	this.assetman = AssetManager.getInstance();
@@ -35,9 +40,16 @@ Game.prototype.run = function(gl) {
 		console.log('Assets loaded');
 
 		self.shaderman = ShaderManager.getInstance();
-		self.shaderman.createProgram(gl, 'base.vert', 'block.frag', 'block');
-		self.shaderman.createProgram(gl, 'base.vert', 'entity.frag', 'entity');
+		self.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
+			'assets/shaders/block.frag.glsl', 'block');
+		self.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
+			'assets/shaders/entity.frag.glsl', 'entity');
 		self.shaderman.addUniform(gl, 'entity', 'uFrame');
+		self.shaderman.addUniform(gl, 'entity', 'uTexRowHeight');
+		self.shaderman.useProgram(gl, 'entity');
+		var height = self.assetman.textureDimensions('assets/images/entities.png').h;
+		var rowHeight = 24 / height;
+		gl.uniform1f(self.shaderman.getProgram('entity').uTexRowHeight, rowHeight);
 
 		self.map = new Map(gl);
 		self.player = new Entity(gl, { x: 10, y: 3 }, 2);
@@ -64,13 +76,29 @@ Game.prototype.update = function(ticks) {
 		mX += 1;
 	}
 	if (Key.isDown(Key.W)) {
-		mY += 1;
+		mY -= 1;
 	}
 	if (Key.isDown(Key.S)) {
-		mY -= 1;
+		mY += 1;
+	}
+
+	/*
+	if (mY < 0) {
+		this.player.setDirection(Direction.UP);
+	} else if (mY > 0) {
+		this.player.setDirection(Direction.DOWN);
+	}
+	*/
+
+	if (mX < 0) {
+		this.player.setDirection(Direction.LEFT);
+	} else if (mX > 0) {
+		this.player.setDirection(Direction.RIGHT);
 	}
 
 	this.player.move({ x: mX, y: mY });
+
+	this.player.update(gl, ticks);
 };
 
 Game.prototype.render = function(gl) {

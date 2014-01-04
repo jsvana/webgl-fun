@@ -9,32 +9,23 @@ var ShaderManager = (function() {
 	};
 
 	ShaderManager.prototype.loadShader = function(gl, shader) {
-		var shaderScript = document.getElementById(shader);
+		var shaderScript = AssetManager.getInstance().getShader(shader);
 		if (!shaderScript) {
 			return null;
 		}
 
-		var str = '';
-		var k = shaderScript.firstChild;
-		while (k) {
-			if (k.nodeType == 3) {
-				str += k.textContent;
-			}
-			k = k.nextSibling;
-		}
-
 		var s;
-		if (shaderScript.type === 'x-shader/x-fragment') {
+		if (shader.indexOf('frag') !== -1) {
 			this.fragShaders[shader] = gl.createShader(gl.FRAGMENT_SHADER);
 			s = this.fragShaders[shader];
-		} else if (shaderScript.type === 'x-shader/x-vertex') {
+		} else if (shader.indexOf('vert') !== -1) {
 			this.vertShaders[shader] = gl.createShader(gl.VERTEX_SHADER);
 			s = this.vertShaders[shader];
 		} else {
 			return null;
 		}
 
-		gl.shaderSource(s, str);
+		gl.shaderSource(s, shaderScript);
 		gl.compileShader(s);
 
 		if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
@@ -58,13 +49,11 @@ var ShaderManager = (function() {
 	ShaderManager.prototype.createProgram
 			= function(gl, vertex, fragment, program) {
 		if (!this.vertShaders[vertex]) {
-			console.log('Loading vertex shader ' + vertex);
 			var v = this.loadShader(gl, vertex);
 		} else {
 			var v = this.vertShaders[vertex];
 		}
 		if (!this.fragShaders[fragment]) {
-			console.log('Loading fragment shader ' + fragment);
 			var f = this.loadShader(gl, fragment);
 		} else {
 			var f = this.fragShaders[fragment];

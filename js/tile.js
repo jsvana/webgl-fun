@@ -15,7 +15,7 @@ var Tile = function(gl, pos, tile) {
 		};
 	}
 
-	var texDim = this.assetman.textureDimensions('assets/world.png');
+	var texDim = this.assetman.textureDimensions('assets/images/world.png');
 
 	var tileX = (tile % Math.floor(texDim.w / this.tileSize)) * this.tileSize
 		/ texDim.w;
@@ -80,7 +80,7 @@ Tile.prototype.render = function(gl) {
 		this.texBuf.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.activeTexture(gl.TEXTURE0);
-	this.assetman.useTexture(gl, 'assets/world.png');
+	this.assetman.useTexture(gl, 'assets/images/world.png');
 	gl.uniform1i(this.prog.uSampler, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);

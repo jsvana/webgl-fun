@@ -25,6 +25,5 @@
 		var game = new Game(gl);
 
 		game.run(gl);
-		window.g = game;
 	};
 })(window);

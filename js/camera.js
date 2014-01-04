@@ -40,8 +40,8 @@ Camera.prototype.resize = function(gl, dim) {
 
 Camera.prototype.updateProjection = function(gl) {
 	mat4.ortho(this.proj, -this.position.x,
-		this.dimensions.w - this.position.x, -this.position.y,
-		this.dimensions.h - this.position.y, -1, 1);
+		this.dimensions.w - this.position.x, this.dimensions.h - this.position.y,
+		-this.position.y, -1, 1);
 	var self = this;
 	var shaderman = ShaderManager.getInstance();
 	shaderman.eachProgram(function(name, prog) {

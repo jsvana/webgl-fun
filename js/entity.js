@@ -21,10 +21,10 @@ var Entity = function(gl, pos, ent) {
 		this.entity = 0;
 	}
 
-	var texDim = this.assetman.textureDimensions('assets/entities.png');
+	var texDim = this.assetman.textureDimensions('assets/images/entities.png');
 
-	var tileX = (this.entity % Math.floor(texDim.w / this.tileSize)) * this.tileSize
-		/ texDim.w;
+	var tileX = (this.entity % Math.floor(texDim.w / this.tileSize))
+		* this.tileSize / texDim.w;
 	var tileY = Math.floor(this.entity / Math.floor(texDim.w / this.tileSize))
 		* this.tileSize / texDim.h;
 
@@ -68,17 +68,16 @@ var Entity = function(gl, pos, ent) {
 
 	this.frameCtr = 0;
 	this.frame = 0;
+
+	this.direction = Direction.LEFT;
 };
 
 Entity.prototype.update = function(gl, ticks) {
 	this.frameCtr += ticks;
 
-	if (this.frameCtr > 10000) {
+	if (this.frameCtr > 500) {
 		this.frame = (this.frame + 1) % 2;
-
-		// Update shader
-		this.prog = this.shaderman.useProgram(gl, 'entity');
-		gl.uniform1i(this.prog.uFrame, this.frame);
+		this.frameCtr = 0;
 	}
 };
 
@@ -96,10 +95,22 @@ Entity.prototype.moveTile = function(pos) {
 	this.position.y += pos.y;
 };
 
+Entity.prototype.setDirection = function(dir) {
+	this.direction = dir;
+};
+
 Entity.prototype.render = function(gl) {
 	this.prog = this.shaderman.useProgram(gl, 'entity');
+	gl.uniform1f(this.prog.uFrame, this.frame);
 
 	mat4.identity(this.mvMatrix);
+
+	if (this.direction === Direction.RIGHT) {
+		mat4.translate(this.mvMatrix, this.mvMatrix,
+			[this.tileSize, 0, 0]);
+
+		mat4.scale(this.mvMatrix, this.mvMatrix, [-1, 1, 1]);
+	}
 
 	mat4.translate(this.mvMatrix, this.mvMatrix,
 		[this.position.x * this.tileSize, this.position.y * this.tileSize, 0]);
@@ -115,7 +126,7 @@ Entity.prototype.render = function(gl) {
 		this.texBuf.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.activeTexture(gl.TEXTURE0);
-	this.assetman.useTexture(gl, 'assets/entities.png');
+	this.assetman.useTexture(gl, 'assets/images/entities.png');
 	gl.uniform1i(this.prog.uSampler, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);

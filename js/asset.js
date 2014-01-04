@@ -2,8 +2,9 @@ var AssetManager = (function() {
 	var instance;
 
 	var AssetManager = function() {
-		this.textures = {};
 		this.json = {};
+		this.shaders = {};
+		this.textures = {};
 	};
 
 	var storeImage = function(gl, name, texture) {
@@ -38,6 +39,14 @@ var AssetManager = (function() {
 		return this.json[name];
 	};
 
+	AssetManager.prototype.getShader = function(name) {
+		return this.shaders[name];
+	};
+
+	AssetManager.prototype.getTexture = function(name) {
+		return this.textures[name];
+	};
+
 	AssetManager.prototype.loadTexture = function(gl, name, load) {
 		var tex = gl.createTexture();
 		tex.image = new Image();
@@ -55,7 +64,15 @@ var AssetManager = (function() {
 	};
 
 	AssetManager.prototype.loadJSON = function(name, load) {
-		$.getJSON(name, load);
+		$.getJSON(name, function(data) {
+			load(name, data);
+		});
+	};
+
+	AssetManager.prototype.loadShader = function(name, load) {
+		$.get(name, function(data) {
+			load(name, data);
+		}, 'text');
 	};
 
 	AssetManager.prototype.loadList = function(gl, assets, callback) {
@@ -63,11 +80,14 @@ var AssetManager = (function() {
 		var total = 0;
 		var self = this;
 
-		if (assets.textures) {
-			total += assets.textures.length;
-		}
 		if (assets.json) {
 			total += assets.json.length;
+		}
+		if (assets.shaders) {
+			total += assets.shaders.length;
+		}
+		if (assets.textures) {
+			total += assets.textures.length;
 		}
 
 		if (assets.textures) {
@@ -86,8 +106,21 @@ var AssetManager = (function() {
 		if (assets.json) {
 			for (var j in assets.json) {
 				console.log('Loading ' + assets.json[j]);
-				this.loadJSON(assets.json[j], function(data) {
-					self.json[assets.json[j]] = data;
+				this.loadJSON(assets.json[j], function(name, data) {
+					self.json[name] = data;
+					count++;
+					if (count === total) {
+						callback();
+					}
+				});
+			}
+		}
+
+		if (assets.shaders) {
+			for (var s in assets.shaders) {
+				console.log('Loading ' + assets.shaders[s]);
+				this.loadShader(assets.shaders[s], function(name, data) {
+					self.shaders[name] = data;
 					count++;
 					if (count === total) {
 						callback();
