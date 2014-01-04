@@ -1,4 +1,3 @@
-webgl-fun
-=========
+# webgl-fun
 
 Fun with WebGL.
