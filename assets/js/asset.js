@@ -2,7 +2,7 @@ var AssetManager = (function() {
 	var instance;
 
 	var AssetManager = function() {
-		this.json = {};
+		this.maps = {};
 		this.shaders = {};
 		this.textures = {};
 	};
@@ -35,8 +35,8 @@ var AssetManager = (function() {
 		};
 	};
 
-	AssetManager.prototype.getJSON = function(name) {
-		return this.json[name];
+	AssetManager.prototype.getMap = function(name) {
+		return this.maps[name];
 	};
 
 	AssetManager.prototype.getShader = function(name) {
@@ -63,7 +63,7 @@ var AssetManager = (function() {
 		tex.image.src = name;
 	};
 
-	AssetManager.prototype.loadJSON = function(name, load) {
+	AssetManager.prototype.loadMap = function(name, load) {
 		$.getJSON(name, function(data) {
 			load(name, data);
 		});
@@ -80,8 +80,8 @@ var AssetManager = (function() {
 		var total = 0;
 		var self = this;
 
-		if (assets.json) {
-			total += assets.json.length;
+		if (assets.maps) {
+			total += assets.maps.length;
 		}
 		if (assets.shaders) {
 			total += assets.shaders.length;
@@ -103,11 +103,11 @@ var AssetManager = (function() {
 			}
 		}
 
-		if (assets.json) {
-			for (var j in assets.json) {
-				console.log('Loading ' + assets.json[j]);
-				this.loadJSON(assets.json[j], function(name, data) {
-					self.json[name] = data;
+		if (assets.maps) {
+			for (var m in assets.maps) {
+				console.log('Loading ' + assets.maps[m]);
+				this.loadMap(assets.maps[m], function(name, data) {
+					self.maps[name] = data;
 					count++;
 					if (count === total) {
 						callback();

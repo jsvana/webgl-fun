@@ -26,7 +26,7 @@ Game.prototype.run = function(gl) {
 	var self = this;
 
 	var assets = {
-		json: ['assets/json/map.json'],
+		maps: ['assets/maps/map.json'],
 		textures: ['assets/images/world.png', 'assets/images/entities.png'],
 		shaders: [
 			'assets/shaders/base.vert.glsl',
@@ -51,10 +51,19 @@ Game.prototype.run = function(gl) {
 		var rowHeight = 24 / height;
 		gl.uniform1f(self.shaderman.getProgram('entity').uTexRowHeight, rowHeight);
 
-		self.map = new Map(gl);
+		self.map = new Map('map');
 		self.player = new Entity(gl, { x: 10, y: 3 }, 2);
 
 		self.camera = new Camera(gl, { x: 0, y: 0 }, { w: 480, h: 360 });
+
+		Key.addUpEvent(Key.E, function(e) {
+			console.log('change map');
+			self.map.changeRoom(Direction.UP);
+		});
+
+		Key.addUpEvent(Key.C, function(e) {
+			self.map.changeRoom(Direction.DOWN);
+		});
 
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
@@ -81,14 +90,6 @@ Game.prototype.update = function(ticks) {
 	if (Key.isDown(Key.S)) {
 		mY += 1;
 	}
-
-	/*
-	if (mY < 0) {
-		this.player.setDirection(Direction.UP);
-	} else if (mY > 0) {
-		this.player.setDirection(Direction.DOWN);
-	}
-	*/
 
 	if (mX < 0) {
 		this.player.setDirection(Direction.LEFT);
