@@ -30,9 +30,9 @@ var Entity = function(gl, pos, ent) {
 
 	var verts = [
 		0, 0, 0.1,
-		1, 0, 0.1,
-		1, 1, 0.1,
-		0, 1, 0.1,
+		this.tileSize, 0, 0.1,
+		this.tileSize, this.tileSize, 0.1,
+		0, this.tileSize, 0.1,
 	];
 
 	this.buffer = gl.createBuffer();
@@ -57,7 +57,8 @@ var Entity = function(gl, pos, ent) {
 	this.indexBuf = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);
 	var indices = [
-		0, 1, 2,      0, 2, 3,    // Front face
+		0, 1, 2,
+		0, 2, 3,
 	];
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
 		gl.STATIC_DRAW);
@@ -115,8 +116,6 @@ Entity.prototype.render = function(gl) {
 	mat4.translate(this.mvMatrix, this.mvMatrix,
 		[this.position.x * this.tileSize, this.position.y * this.tileSize, 0]);
 
-	mat4.scale(this.mvMatrix, this.mvMatrix, [this.tileSize, this.tileSize, 1]);
-
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 	gl.vertexAttribPointer(this.prog.vertexPositionAttribute,
 		this.buffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -127,6 +126,8 @@ Entity.prototype.render = function(gl) {
 
 	gl.activeTexture(gl.TEXTURE0);
 	this.assetman.useTexture(gl, 'assets/images/entities.png');
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.uniform1i(this.prog.uSampler, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);

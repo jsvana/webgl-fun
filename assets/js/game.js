@@ -39,30 +39,26 @@ Game.prototype.run = function(gl) {
 	this.assetman.loadList(gl, assets, function() {
 		console.log('Assets loaded');
 
-		self.shaderman = ShaderManager.getInstance();
-		self.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
-			'assets/shaders/block.frag.glsl', 'block');
-		self.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
-			'assets/shaders/entity.frag.glsl', 'entity');
-		self.shaderman.addUniform(gl, 'entity', 'uFrame');
-		self.shaderman.addUniform(gl, 'entity', 'uTexRowHeight');
-		self.shaderman.useProgram(gl, 'entity');
-		var height = self.assetman.textureDimensions('assets/images/entities.png').h;
-		var rowHeight = 24 / height;
-		gl.uniform1f(self.shaderman.getProgram('entity').uTexRowHeight, rowHeight);
+		self.initShaders(gl);
 
 		self.map = new Map('map');
 		self.player = new Entity(gl, { x: 10, y: 3 }, 2);
-
 		self.camera = new Camera(gl, { x: 0, y: 0 }, { w: 480, h: 360 });
 
 		Key.addUpEvent(Key.E, function(e) {
-			console.log('change map');
 			self.map.changeRoom(Direction.UP);
 		});
 
 		Key.addUpEvent(Key.C, function(e) {
 			self.map.changeRoom(Direction.DOWN);
+		});
+
+		Key.addDownEvent(Key.A, function(e) {
+			self.player.setDirection(Direction.LEFT);
+		});
+
+		Key.addDownEvent(Key.D, function(e) {
+			self.player.setDirection(Direction.RIGHT);
 		});
 
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -71,7 +67,23 @@ Game.prototype.run = function(gl) {
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 		self.tick(gl);
+	}, function(count, total) {
+		console.log('Loading... (' + ((count / total * 100) | 0) + '%)');
 	});
+};
+
+Game.prototype.initShaders = function(gl) {
+	this.shaderman = ShaderManager.getInstance();
+	this.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
+		'assets/shaders/block.frag.glsl', 'block');
+	this.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
+		'assets/shaders/entity.frag.glsl', 'entity');
+	this.shaderman.addUniform(gl, 'entity', 'uFrame');
+	this.shaderman.addUniform(gl, 'entity', 'uTexRowHeight');
+	this.shaderman.useProgram(gl, 'entity');
+	var height = this.assetman.textureDimensions('assets/images/entities.png').h;
+	var rowHeight = 24 / height;
+	gl.uniform1f(this.shaderman.getProgram('entity').uTexRowHeight, rowHeight);
 };
 
 Game.prototype.update = function(ticks) {
@@ -89,12 +101,6 @@ Game.prototype.update = function(ticks) {
 	}
 	if (Key.isDown(Key.S)) {
 		mY += 1;
-	}
-
-	if (mX < 0) {
-		this.player.setDirection(Direction.LEFT);
-	} else if (mX > 0) {
-		this.player.setDirection(Direction.RIGHT);
 	}
 
 	this.player.move({ x: mX, y: mY });

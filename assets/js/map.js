@@ -4,7 +4,6 @@ var Map = function(map) {
 
 Map.prototype.loadMap = function(map) {
 	var data = AssetManager.getInstance().getMap('assets/maps/' + map + '.json');
-	console.log(data);
 
 	this.width = data.map.width;
 	this.height = data.map.height;
@@ -16,13 +15,11 @@ Map.prototype.loadMap = function(map) {
 	for (var i = 0; i < this.height * this.roomHeight; i++) {
 		var r = [];
 		for (var j = 0; j < this.width * this.roomWidth; j++) {
-			r.push(new Tile(gl, { x: j % this.roomWidth, y: i % this.roomHeight },
+			r.push(new Tile(gl, { x: j % this.roomWidth, y: i % this.roomHeight},
 				data.map.data[i][j]));
 		}
 		this.tiles.push(r);
 	}
-
-	console.log('Map "' + map + '" loaded');
 };
 
 Map.prototype.changeRoom = function(dir) {

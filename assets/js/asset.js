@@ -13,8 +13,8 @@ var AssetManager = (function() {
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 
 		instance.textures[name] = texture;
@@ -75,7 +75,7 @@ var AssetManager = (function() {
 		}, 'text');
 	};
 
-	AssetManager.prototype.loadList = function(gl, assets, callback) {
+	AssetManager.prototype.loadList = function(gl, assets, callback, progress) {
 		var count = 0;
 		var total = 0;
 		var self = this;
@@ -92,10 +92,13 @@ var AssetManager = (function() {
 
 		if (assets.textures) {
 			for (var tex in assets.textures) {
-				console.log('Loading ' + assets.textures[tex]);
 				this.loadTexture(gl, assets.textures[tex], function(gl, name, texture) {
 					storeImage(gl, name, texture);
+
 					count++;
+					if (progress) {
+						progress(count, total);
+					}
 					if (count === total) {
 						callback();
 					}
@@ -105,10 +108,13 @@ var AssetManager = (function() {
 
 		if (assets.maps) {
 			for (var m in assets.maps) {
-				console.log('Loading ' + assets.maps[m]);
 				this.loadMap(assets.maps[m], function(name, data) {
 					self.maps[name] = data;
+
 					count++;
+					if (progress) {
+						progress(count, total);
+					}
 					if (count === total) {
 						callback();
 					}
@@ -118,10 +124,13 @@ var AssetManager = (function() {
 
 		if (assets.shaders) {
 			for (var s in assets.shaders) {
-				console.log('Loading ' + assets.shaders[s]);
 				this.loadShader(assets.shaders[s], function(name, data) {
 					self.shaders[name] = data;
+
 					count++;
+					if (progress) {
+						progress(count, total);
+					}
 					if (count === total) {
 						callback();
 					}

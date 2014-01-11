@@ -24,9 +24,9 @@ var Tile = function(gl, pos, tile) {
 
 	var verts = [
 		0, 0, 0,
-		1, 0, 0,
-		1, 1, 0,
-		0, 1, 0,
+		this.tileSize, 0, 0,
+		this.tileSize, this.tileSize, 0,
+		0, this.tileSize, 0,
 	];
 
 	this.buffer = gl.createBuffer();
@@ -51,7 +51,8 @@ var Tile = function(gl, pos, tile) {
 	this.indexBuf = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);
 	var indices = [
-		0, 1, 2,      0, 2, 3,    // Front face
+		0, 1, 2,
+		0, 2, 3,
 	];
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
 		gl.STATIC_DRAW);
@@ -68,8 +69,6 @@ Tile.prototype.render = function(gl) {
 
 	mat4.translate(this.mvMatrix, this.mvMatrix,
 		[this.position.x * this.tileSize, this.position.y * this.tileSize, 0]);
-
-	mat4.scale(this.mvMatrix, this.mvMatrix, [this.tileSize, this.tileSize, 1]);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 	gl.vertexAttribPointer(this.prog.vertexPositionAttribute,
