@@ -30,9 +30,9 @@ var Entity = function(gl, pos, ent) {
 
 	var verts = [
 		0, 0, 0.1,
-		this.tileSize, 0, 0.1,
-		this.tileSize, this.tileSize, 0.1,
-		0, this.tileSize, 0.1,
+		this.tileSize - 1, 0, 0.1,
+		this.tileSize - 1, this.tileSize - 1, 0.1,
+		0, this.tileSize - 1, 0.1,
 	];
 
 	this.buffer = gl.createBuffer();
@@ -71,6 +71,10 @@ var Entity = function(gl, pos, ent) {
 	this.frame = 0;
 
 	this.direction = Direction.LEFT;
+};
+
+Entity.prototype.size = function() {
+	return this.tileSize;
 };
 
 Entity.prototype.update = function(gl, ticks) {

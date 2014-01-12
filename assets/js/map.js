@@ -11,6 +11,8 @@ Map.prototype.loadMap = function(map) {
 	this.roomHeight = data.map.roomHeight;
 	this.currentRoom = data.map.currentRoom;
 
+	this.walkability = data.map.walkability;
+
 	this.tiles = [];
 	for (var i = 0; i < this.height * this.roomHeight; i++) {
 		var r = [];
@@ -20,6 +22,24 @@ Map.prototype.loadMap = function(map) {
 		}
 		this.tiles.push(r);
 	}
+};
+
+Map.prototype.adjustMove = function(ent, move) {
+	var pos = ent.position;
+	var info = 'Position: (' + Math.floor(pos.x) + ', '
+		+ Math.floor(pos.y) + ')' + ', Move: (' + move.x + ', ' + move.y
+		+ ')';
+
+	$('#data').html(info);
+
+	if (pos.x + move.x < -1 || pos.x + move.x > this.roomWidth) {
+		move.x = 0;
+	}
+	if (pos.y + move.y < -1 || pos.y + move.y > this.roomHeight) {
+		move.y = 0;
+	}
+
+	return move;
 };
 
 Map.prototype.changeRoom = function(dir) {

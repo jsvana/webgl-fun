@@ -24,9 +24,9 @@ var Tile = function(gl, pos, tile) {
 
 	var verts = [
 		0, 0, 0,
-		this.tileSize, 0, 0,
-		this.tileSize, this.tileSize, 0,
-		0, this.tileSize, 0,
+		this.tileSize - 1, 0, 0,
+		this.tileSize - 1, this.tileSize - 1, 0,
+		0, this.tileSize - 1, 0,
 	];
 
 	this.buffer = gl.createBuffer();

@@ -10,11 +10,11 @@ canvas {
 	image-rendering: -o-crisp-edges;
 	image-rendering: optimize-contrast;
 	-ms-interpolation-mode: nearest-neighbor;
-	/*
 	width: 960px;
 	height: 720px;
-	*/
+	/*
 	width: 100%;
 	height: 100%;
+	*/
 	border: none;
 }

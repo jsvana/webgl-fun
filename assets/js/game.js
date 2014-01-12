@@ -103,7 +103,9 @@ Game.prototype.update = function(ticks) {
 		mY += 1;
 	}
 
-	this.player.move({ x: mX, y: mY });
+	var m = { x: mX, y: mY };
+
+	this.player.move(this.map.adjustMove(this.player, m));
 
 	this.player.update(gl, ticks);
 };
