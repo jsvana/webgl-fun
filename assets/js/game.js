@@ -91,21 +91,21 @@ Game.prototype.update = function(ticks) {
 	var mY = 0;
 
 	if (Key.isDown(Key.A)) {
-		mX -= 1;
+		mX -= 1 / 24;
 	}
 	if (Key.isDown(Key.D)) {
-		mX += 1;
+		mX += 1 / 24;
 	}
 	if (Key.isDown(Key.W)) {
-		mY -= 1;
+		mY -= 1 / 24;
 	}
 	if (Key.isDown(Key.S)) {
-		mY += 1;
+		mY += 1 / 24;
 	}
 
 	var m = { x: mX, y: mY };
 
-	this.player.move(this.map.adjustMove(this.player, m));
+	this.map.moveEntity(this.player, m);
 
 	this.player.update(gl, ticks);
 };

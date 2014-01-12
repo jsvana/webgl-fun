@@ -24,7 +24,7 @@ Map.prototype.loadMap = function(map) {
 	}
 };
 
-Map.prototype.adjustMove = function(ent, move) {
+Map.prototype.moveEntity = function(ent, move) {
 	var pos = ent.position;
 	var info = 'Position: (' + Math.floor(pos.x) + ', '
 		+ Math.floor(pos.y) + ')' + ', Move: (' + move.x + ', ' + move.y
@@ -32,11 +32,37 @@ Map.prototype.adjustMove = function(ent, move) {
 
 	$('#data').html(info);
 
-	if (pos.x + move.x < -1 || pos.x + move.x > this.roomWidth) {
-		move.x = 0;
+	var newPos = {
+		x: Math.floor(pos.x + move.x),
+		y: Math.floor(pos.y + move.y)
+	};
+
+	if (newPos.x !== Math.floor(pos.x)) {
+		if (newPos.x < 0) {
+			ent.position.x = 0;
+		} else {
+			ent.position.x += move.x;
+		}
+	} else {
+		if (pos.x >= this.roomWidth - 1 && move.x > 0) {
+			ent.position.x = this.roomWidth - 1;
+		} else {
+			ent.position.x += move.x;
+		}
 	}
-	if (pos.y + move.y < -1 || pos.y + move.y > this.roomHeight) {
-		move.y = 0;
+
+	if (newPos.y !== Math.floor(pos.y)) {
+		if (newPos.y < 0) {
+			ent.position.y = 0;
+		} else {
+			ent.position.y += move.y;
+		}
+	} else {
+		if (pos.y >= this.roomHeight - 1 && move.y > 0) {
+			ent.position.y = this.roomHeight - 1;
+		} else {
+			ent.position.y += move.y;
+		}
 	}
 
 	return move;

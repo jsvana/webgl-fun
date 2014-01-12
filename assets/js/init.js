@@ -3,8 +3,10 @@
 		try {
 			var c = window.document.getElementById('c');
 			gl = c.getContext("experimental-webgl");
-			gl.viewportWidth = c.width;
-			gl.viewportHeight = c.height;
+			gl.viewportWidth = 480;
+			gl.viewportHeight = 320;
+			c.width = 480;
+			c.height = 320;
 		} catch (e) {
 			return false;
 		} finally {
