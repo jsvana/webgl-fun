@@ -45,7 +45,7 @@ Map.prototype.moveEntity = function(ent, move) {
 
 	if (pos.y !== 0 && move.y < 0 && this.walkable(pos.x, pos.y - 1)) {
 		mY = -1;
-	} else if (pos.y !== this.roomWidth - 1 && move.y > 0
+	} else if (pos.y !== this.roomHeight - 1 && move.y > 0
 			&& this.walkable(pos.x, pos.y + 1)) {
 		mY = 1;
 	}

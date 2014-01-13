@@ -134,7 +134,6 @@ Entity.prototype.update = function(gl, ticks) {
 			} else {
 				var dX = Math.floor(Math.random() * this.bounds.r - 1) + 1;
 				var dY = Math.floor(Math.random() * this.bounds.b - 1) + 1;
-				console.log('new dest: (' + dX + ', ' + dY + ')');
 				this.setDestination(Game.map, dX, dY);
 			}
 		}
