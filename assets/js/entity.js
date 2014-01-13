@@ -21,12 +21,19 @@ var Entity = function(gl, pos, ent) {
 		this.entity = 0;
 	}
 
+	this.tween = {
+		x: 0,
+		y: 0
+	};
+
 	var texDim = this.assetman.textureDimensions('assets/images/entities.png');
 
 	var tileX = (this.entity % Math.floor(texDim.w / this.tileSize))
 		* this.tileSize / texDim.w;
 	var tileY = Math.floor(this.entity / Math.floor(texDim.w / this.tileSize))
 		* this.tileSize / texDim.h;
+
+	console.log('x: ' + tileX + ', y: ' + tileY);
 
 	var verts = [
 		0, 0, 0.1,
@@ -84,20 +91,56 @@ Entity.prototype.update = function(gl, ticks) {
 		this.frame = (this.frame + 1) % 2;
 		this.frameCtr = 0;
 	}
+
+	if (this.isTweening()) {
+		if (this.tween.x < 0) {
+			this.tween.x++;
+		} else if (this.tween.x > 0) {
+			this.tween.x--;
+		}
+
+		if (this.tween.y < 0) {
+			this.tween.y++;
+		} else if (this.tween.y > 0) {
+			this.tween.y--;
+		}
+	}
 };
 
 Entity.prototype.setPosition = function(pos) {
 	this.position = pos;
 };
 
-Entity.prototype.move = function(pos) {
-	this.position.x += pos.x / this.tileSize;
-	this.position.y += pos.y / this.tileSize;
+Entity.prototype.isTweeningX = function() {
+	return this.tween.x !== 0;
+}
+
+Entity.prototype.isTweeningY = function() {
+	return this.tween.y !== 0;
+}
+
+Entity.prototype.isTweening = function() {
+	return this.isTweeningX() || this.isTweeningY();
 };
 
-Entity.prototype.moveTile = function(pos) {
-	this.position.x += pos.x;
-	this.position.y += pos.y;
+Entity.prototype.move = function(mX, mY) {
+	if (!this.isTweeningX()) {
+		this.position.x += mX;
+		if (mX > 0) {
+			this.tween.x = -this.tileSize;
+		} else if (mX < 0) {
+			this.tween.x = this.tileSize;
+		}
+	}
+
+	if (!this.isTweeningY()) {
+		this.position.y += mY;
+		if (mY > 0) {
+			this.tween.y = -this.tileSize;
+		} else if (mY < 0) {
+			this.tween.y = this.tileSize;
+		}
+	}
 };
 
 Entity.prototype.setDirection = function(dir) {
@@ -118,7 +161,10 @@ Entity.prototype.render = function(gl) {
 	}
 
 	mat4.translate(this.mvMatrix, this.mvMatrix,
-		[this.position.x * this.tileSize, this.position.y * this.tileSize, 0]);
+		[
+			this.position.x * this.tileSize + this.tween.x,
+			this.position.y * this.tileSize + this.tween.y, 0
+		]);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 	gl.vertexAttribPointer(this.prog.vertexPositionAttribute,
@@ -130,8 +176,6 @@ Entity.prototype.render = function(gl) {
 
 	gl.activeTexture(gl.TEXTURE0);
 	this.assetman.useTexture(gl, 'assets/images/entities.png');
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.uniform1i(this.prog.uSampler, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);

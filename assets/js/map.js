@@ -24,48 +24,37 @@ Map.prototype.loadMap = function(map) {
 	}
 };
 
+Map.prototype.walkable = function(x, y) {
+	return this.walkability[this.tiles
+			[y + this.currentRoom.y * this.roomHeight]
+			[x + this.currentRoom.x * this.roomWidth].type
+		];
+};
+
 Map.prototype.moveEntity = function(ent, move) {
 	var pos = ent.position;
-	var info = 'Position: (' + Math.floor(pos.x) + ', '
-		+ Math.floor(pos.y) + ')' + ', Move: (' + move.x + ', ' + move.y
-		+ ')';
+	var mX = 0;
+	var mY = 0;
 
-	$('#data').html(info);
-
-	var newPos = {
-		x: Math.floor(pos.x + move.x),
-		y: Math.floor(pos.y + move.y)
-	};
-
-	if (newPos.x !== Math.floor(pos.x)) {
-		if (newPos.x < 0) {
-			ent.position.x = 0;
-		} else {
-			ent.position.x += move.x;
-		}
-	} else {
-		if (pos.x >= this.roomWidth - 1 && move.x > 0) {
-			ent.position.x = this.roomWidth - 1;
-		} else {
-			ent.position.x += move.x;
-		}
+	if (pos.x !== 0 && move.x < 0 && this.walkable(pos.x - 1, pos.y)) {
+		mX = -1;
+	} else if (pos.x !== this.roomWidth - 1 && move.x > 0
+			&& this.walkable(pos.x + 1, pos.y)) {
+		mX = 1;
 	}
 
-	if (newPos.y !== Math.floor(pos.y)) {
-		if (newPos.y < 0) {
-			ent.position.y = 0;
-		} else {
-			ent.position.y += move.y;
-		}
-	} else {
-		if (pos.y >= this.roomHeight - 1 && move.y > 0) {
-			ent.position.y = this.roomHeight - 1;
-		} else {
-			ent.position.y += move.y;
-		}
+	if (pos.y !== 0 && move.y < 0 && this.walkable(pos.x, pos.y - 1)) {
+		mY = -1;
+	} else if (pos.y !== this.roomWidth - 1 && move.y > 0
+			&& this.walkable(pos.x, pos.y + 1)) {
+		mY = 1;
 	}
 
-	return move;
+	if (mX !== 0) {
+		ent.move(mX, 0);
+	} else if (mY !== 0) {
+		ent.move(0, mY);
+	}
 };
 
 Map.prototype.changeRoom = function(dir) {

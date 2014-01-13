@@ -91,16 +91,16 @@ Game.prototype.update = function(ticks) {
 	var mY = 0;
 
 	if (Key.isDown(Key.A)) {
-		mX -= 1 / 24;
+		mX -= 1;
 	}
 	if (Key.isDown(Key.D)) {
-		mX += 1 / 24;
+		mX += 1;
 	}
 	if (Key.isDown(Key.W)) {
-		mY -= 1 / 24;
+		mY -= 1;
 	}
 	if (Key.isDown(Key.S)) {
-		mY += 1 / 24;
+		mY += 1;
 	}
 
 	var m = { x: mX, y: mY };
