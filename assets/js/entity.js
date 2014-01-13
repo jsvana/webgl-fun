@@ -49,9 +49,9 @@ var Entity = function(gl, pos, ent, type, bounds) {
 
 	var verts = [
 		0, 0, 0.1,
-		this.tileSize - 1, 0, 0.1,
-		this.tileSize - 1, this.tileSize - 1, 0.1,
-		0, this.tileSize - 1, 0.1,
+		this.tileSize, 0, 0.1,
+		this.tileSize, this.tileSize, 0.1,
+		0, this.tileSize, 0.1,
 	];
 
 	this.buffer = gl.createBuffer();

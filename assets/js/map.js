@@ -5,6 +5,8 @@ var Map = function(map) {
 Map.prototype.loadMap = function(map) {
 	var data = AssetManager.getInstance().getMap('assets/maps/' + map + '.json');
 
+	this.layerCount = data.map.layerCount;
+
 	this.width = data.map.width;
 	this.height = data.map.height;
 	this.roomWidth = data.map.roomWidth;
@@ -15,8 +17,13 @@ Map.prototype.loadMap = function(map) {
 	for (var i = 0; i < this.height * this.roomHeight; i++) {
 		var r = [];
 		for (var j = 0; j < this.width * this.roomWidth; j++) {
-			r.push(new Tile(gl, { x: j % this.roomWidth, y: i % this.roomHeight},
-				data.map.data[i][j], data.map.walkability[data.map.data[i][j]]));
+			var t = [];
+			for (var l = 0; l < this.layerCount; l++) {
+				var type = data.map.data[l * this.roomHeight + i][j];
+				t.push(new Tile(gl, { x: j % this.roomWidth, y: i % this.roomHeight},
+					type, type, .001 * l));
+			}
+			r.push(new MapTile(t));
 		}
 		this.tiles.push(r);
 	}

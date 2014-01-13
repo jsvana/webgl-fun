@@ -1,4 +1,4 @@
-var Tile = function(gl, pos, tile, walkable) {
+var Tile = function(gl, pos, tile, walkable, depth) {
 	this.tileSize = 24;
 	this.type = tile;
 	this.walkable = walkable;
@@ -17,6 +17,10 @@ var Tile = function(gl, pos, tile, walkable) {
 		};
 	}
 
+	if (tile === -1) {
+		return;
+	}
+
 	var texDim = this.assetman.textureDimensions('assets/images/world.png');
 
 	var tileX = (tile % Math.floor(texDim.w / this.tileSize)) * this.tileSize
@@ -25,10 +29,10 @@ var Tile = function(gl, pos, tile, walkable) {
 		* this.tileSize / texDim.h;
 
 	var verts = [
-		0, 0, 0,
-		this.tileSize - 1, 0, 0,
-		this.tileSize - 1, this.tileSize - 1, 0,
-		0, this.tileSize - 1, 0,
+		0, 0, depth,
+		this.tileSize, 0, depth,
+		this.tileSize, this.tileSize, depth,
+		0, this.tileSize, depth,
 	];
 
 	this.buffer = gl.createBuffer();
@@ -65,6 +69,10 @@ var Tile = function(gl, pos, tile, walkable) {
 };
 
 Tile.prototype.render = function(gl) {
+	if (this.type === -1) {
+		return;
+	}
+
 	this.prog = this.shaderman.useProgram(gl, 'block');
 
 	mat4.identity(this.mvMatrix);
@@ -87,4 +95,24 @@ Tile.prototype.render = function(gl) {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);
 	gl.uniformMatrix4fv(this.prog.uMVMatrix, false, this.mvMatrix);
 	gl.drawElements(gl.TRIANGLES, this.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
+};
+
+var MapTile = function(tiles) {
+	this.tiles = tiles;
+	this.position = tiles[0].position;
+	this.tileSize = tiles[0].tileSize;
+
+	this.walkable = true;
+	for (var t in tiles) {
+		if (!tiles[t].walkable) {
+			this.walkable = false;
+			break;
+		}
+	}
+};
+
+MapTile.prototype.render = function(gl) {
+	for (var t in this.tiles) {
+		this.tiles[t].render(gl);
+	}
 };
