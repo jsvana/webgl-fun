@@ -11,24 +11,24 @@ Map.prototype.loadMap = function(map) {
 	this.roomHeight = data.map.roomHeight;
 	this.currentRoom = data.map.currentRoom;
 
-	this.walkability = data.map.walkability;
-
 	this.tiles = [];
 	for (var i = 0; i < this.height * this.roomHeight; i++) {
 		var r = [];
 		for (var j = 0; j < this.width * this.roomWidth; j++) {
 			r.push(new Tile(gl, { x: j % this.roomWidth, y: i % this.roomHeight},
-				data.map.data[i][j]));
+				data.map.data[i][j], data.map.walkability[data.map.data[i][j]]));
 		}
 		this.tiles.push(r);
 	}
 };
 
 Map.prototype.walkable = function(x, y) {
-	return this.walkability[this.tiles
-			[y + this.currentRoom.y * this.roomHeight]
-			[x + this.currentRoom.x * this.roomWidth].type
-		];
+	return this.tiles[y + this.currentRoom.y * this.roomHeight]
+		[x + this.currentRoom.x * this.roomWidth].walkable
+};
+
+Map.prototype.getTile = function(x, y) {
+	return this.tiles[y][x];
 };
 
 Map.prototype.moveEntity = function(ent, move) {

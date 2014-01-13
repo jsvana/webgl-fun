@@ -1,4 +1,4 @@
-(function(window) {
+(function() {
 	var initGL = function() {
 		try {
 			var c = window.document.getElementById('c');
@@ -18,14 +18,14 @@
 		}
 	};
 
-	window.init = function() {
+	init = function() {
 		if (!initGL()) {
 			console.log("Unable to initialize WebGL");
 			return;
 		}
 
-		var game = new Game(gl);
+		Game = new Game(gl);
 
-		game.run(gl);
+		Game.run(gl);
 	};
-})(window);
+})();

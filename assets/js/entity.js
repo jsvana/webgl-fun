@@ -1,4 +1,10 @@
-var Entity = function(gl, pos, ent) {
+var EntityType = {
+	NONE: 0,
+	PLAYER: 1,
+	RANDOM_ENEMY: 2,
+};
+
+var Entity = function(gl, pos, ent, type, bounds) {
 	this.tileSize = 24;
 
 	this.assetman = AssetManager.getInstance();
@@ -21,10 +27,18 @@ var Entity = function(gl, pos, ent) {
 		this.entity = 0;
 	}
 
+	this.type = type;
+
+	if (bounds) {
+		this.bounds = bounds;
+	}
+
 	this.tween = {
 		x: 0,
 		y: 0
 	};
+
+	this.path = [];
 
 	var texDim = this.assetman.textureDimensions('assets/images/entities.png');
 
@@ -32,8 +46,6 @@ var Entity = function(gl, pos, ent) {
 		* this.tileSize / texDim.w;
 	var tileY = Math.floor(this.entity / Math.floor(texDim.w / this.tileSize))
 		* this.tileSize / texDim.h;
-
-	console.log('x: ' + tileX + ', y: ' + tileY);
 
 	var verts = [
 		0, 0, 0.1,
@@ -80,6 +92,15 @@ var Entity = function(gl, pos, ent) {
 	this.direction = Direction.LEFT;
 };
 
+Entity.prototype.hasPath = function() {
+	return this.path.length !== 0;
+};
+
+Entity.prototype.setDestination = function(map, x, y) {
+	this.path = Util.AStar.path(map,
+		map.getTile(this.position.x, this.position.y), map.getTile(x, y));
+};
+
 Entity.prototype.size = function() {
 	return this.tileSize;
 };
@@ -103,6 +124,19 @@ Entity.prototype.update = function(gl, ticks) {
 			this.tween.y++;
 		} else if (this.tween.y > 0) {
 			this.tween.y--;
+		}
+	} else {
+		if (this.type === EntityType.RANDOM_ENEMY) {
+			if (this.hasPath()) {
+				var tile = this.path.shift();
+				this.move(tile.position.x - this.position.x,
+					tile.position.y - this.position.y);
+			} else {
+				var dX = Math.floor(Math.random() * this.bounds.r - 1) + 1;
+				var dY = Math.floor(Math.random() * this.bounds.b - 1) + 1;
+				console.log('new dest: (' + dX + ', ' + dY + ')');
+				this.setDestination(Game.map, dX, dY);
+			}
 		}
 	}
 };

@@ -4,4 +4,3 @@
 	- Expose event API
 - Projectiles?
 - Other entities
-- Pathfinding

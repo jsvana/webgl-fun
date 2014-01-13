@@ -1,6 +1,7 @@
-var Tile = function(gl, pos, tile) {
+var Tile = function(gl, pos, tile, walkable) {
 	this.tileSize = 24;
 	this.type = tile;
+	this.walkable = walkable;
 
 	this.assetman = AssetManager.getInstance();
 	this.shaderman = ShaderManager.getInstance();

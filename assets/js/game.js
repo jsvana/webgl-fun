@@ -42,7 +42,17 @@ Game.prototype.run = function(gl) {
 		self.initShaders(gl);
 
 		self.map = new Map('map');
+		/*
+		var p = Util.AStar.path(self.map, self.map.getTile(1, 1),
+			self.map.getTile(10, 3));
+		*/
 		self.player = new Entity(gl, { x: 10, y: 3 }, 2);
+		self.enemies = [];
+		self.enemies.push(new Entity(gl, { x: 1, y: 1 }, 259,
+			EntityType.RANDOM_ENEMY, {
+				t: 1, b: self.map.roomHeight - 1,
+				l: 1, r: self.map.roomWidth - 1
+			}));
 		self.camera = new Camera(gl, { x: 0, y: 0 }, { w: 480, h: 360 });
 
 		Key.addUpEvent(Key.E, function(e) {
@@ -108,6 +118,10 @@ Game.prototype.update = function(ticks) {
 	this.map.moveEntity(this.player, m);
 
 	this.player.update(gl, ticks);
+
+	for (var e in this.enemies) {
+		this.enemies[e].update(gl, ticks);
+	}
 };
 
 Game.prototype.render = function(gl) {
@@ -116,4 +130,8 @@ Game.prototype.render = function(gl) {
 
 	this.map.render(gl);
 	this.player.render(gl);
+
+	for (var e in this.enemies) {
+		this.enemies[e].render(gl);
+	}
 };
