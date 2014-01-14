@@ -40,12 +40,14 @@ var Entity = function(gl, pos, ent, type, bounds) {
 
 	this.path = [];
 
-	var texDim = this.assetman.textureDimensions('assets/images/entities.png');
+	var texDim = this.assetman.textureDimensions('assets/images/sprites.png');
 
-	var tileX = (this.entity % Math.floor(texDim.w / this.tileSize))
-		* this.tileSize / texDim.w;
-	var tileY = Math.floor(this.entity / Math.floor(texDim.w / this.tileSize))
+	var tileX = (ent % Math.floor(texDim.w / this.tileSize)) * this.tileSize
+		/ texDim.w;
+	var tileY = Math.floor(ent / Math.floor(texDim.w / this.tileSize))
 		* this.tileSize / texDim.h;
+
+	console.log('x: ' + tileX + ', y: ' + tileY);
 
 	var verts = [
 		0, 0, 0.1,
@@ -181,7 +183,7 @@ Entity.prototype.setDirection = function(dir) {
 };
 
 Entity.prototype.render = function(gl) {
-	this.prog = this.shaderman.useProgram(gl, 'entity');
+	this.prog = this.shaderman.useProgram(gl, 'sprite');
 	gl.uniform1f(this.prog.uFrame, this.frame);
 
 	mat4.identity(this.mvMatrix);
@@ -208,7 +210,7 @@ Entity.prototype.render = function(gl) {
 		this.texBuf.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.activeTexture(gl.TEXTURE0);
-	this.assetman.useTexture(gl, 'assets/images/entities.png');
+	this.assetman.useTexture(gl, 'assets/images/sprites.png');
 	gl.uniform1i(this.prog.uSampler, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuf);

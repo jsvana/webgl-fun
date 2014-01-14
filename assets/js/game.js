@@ -27,11 +27,11 @@ Game.prototype.run = function(gl) {
 
 	var assets = {
 		maps: ['assets/maps/map.json'],
-		textures: ['assets/images/world.png', 'assets/images/entities.png'],
+		textures: ['assets/images/world.png', 'assets/images/sprites.png'],
 		shaders: [
 			'assets/shaders/base.vert.glsl',
 			'assets/shaders/block.frag.glsl',
-			'assets/shaders/entity.frag.glsl'
+			'assets/shaders/sprite.frag.glsl'
 		]
 	};
 
@@ -48,7 +48,7 @@ Game.prototype.run = function(gl) {
 		*/
 		self.player = new Entity(gl, { x: 10, y: 3 }, 2);
 		self.enemies = [];
-		self.enemies.push(new Entity(gl, { x: 1, y: 1 }, 259,
+		self.enemies.push(new Entity(gl, { x: 1, y: 1 }, 247,
 			EntityType.RANDOM_ENEMY, {
 				t: 1, b: self.map.roomHeight - 1,
 				l: 1, r: self.map.roomWidth - 1
@@ -87,13 +87,13 @@ Game.prototype.initShaders = function(gl) {
 	this.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
 		'assets/shaders/block.frag.glsl', 'block');
 	this.shaderman.createProgram(gl, 'assets/shaders/base.vert.glsl',
-		'assets/shaders/entity.frag.glsl', 'entity');
-	this.shaderman.addUniform(gl, 'entity', 'uFrame');
-	this.shaderman.addUniform(gl, 'entity', 'uTexRowHeight');
-	this.shaderman.useProgram(gl, 'entity');
-	var height = this.assetman.textureDimensions('assets/images/entities.png').h;
+		'assets/shaders/sprite.frag.glsl', 'sprite');
+	this.shaderman.addUniform(gl, 'sprite', 'uFrame');
+	this.shaderman.addUniform(gl, 'sprite', 'uTexRowHeight');
+	this.shaderman.useProgram(gl, 'sprite');
+	var height = this.assetman.textureDimensions('assets/images/sprites.png').h;
 	var rowHeight = 24 / height;
-	gl.uniform1f(this.shaderman.getProgram('entity').uTexRowHeight, rowHeight);
+	gl.uniform1f(this.shaderman.getProgram('sprite').uTexRowHeight, rowHeight);
 };
 
 Game.prototype.update = function(ticks) {

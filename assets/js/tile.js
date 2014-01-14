@@ -1,5 +1,8 @@
 var Tile = function(gl, pos, tile, walkable, depth) {
 	this.tileSize = 24;
+	this.spacing = 2;
+	this.margin = 1;
+
 	this.type = tile;
 	this.walkable = walkable;
 
@@ -23,10 +26,13 @@ var Tile = function(gl, pos, tile, walkable, depth) {
 
 	var texDim = this.assetman.textureDimensions('assets/images/world.png');
 
-	var tileX = (tile % Math.floor(texDim.w / this.tileSize)) * this.tileSize
-		/ texDim.w;
-	var tileY = Math.floor(tile / Math.floor(texDim.w / this.tileSize))
-		* this.tileSize / texDim.h;
+	var tilesetW = Math.floor(texDim.w / (this.tileSize + this.spacing));
+	var tilesetH = Math.floor(texDim.h / (this.tileSize + this.spacing));
+
+	var tileX = (tile % tilesetW) * (this.tileSize + this.spacing) / texDim.w
+		+ this.margin / texDim.w;
+	var tileY = Math.floor(tile / tilesetH) * (this.tileSize + this.spacing)
+		/ texDim.h + this.margin / texDim.h;
 
 	var verts = [
 		0, 0, depth,
